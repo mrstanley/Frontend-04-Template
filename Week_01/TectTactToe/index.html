@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecTacToe - 三子棋</title>
+    <style>
+        #board .cell {
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            text-align: center;
+            font-size: 50px;
+            background-color: green;
+            color: red;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 2px;
+            overflow: hidden;
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="board"></div>
+
+    <script>
+        const pattern = [
+            [1, 0, 0],
+            [0, 2, 0],
+            [0, 0, 0]
+        ]
+
+        let type = 1;
+
+        function show() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            for (let i = 0; i < pattern.length; i++) {
+                for (let j = 0; j < pattern[i].length; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell')
+                    const value = pattern[i][j];
+                    cell.innerText =
+                        value === 2 ? '✔' :
+                            value === 1 ? '✘' : '';
+                    cell.addEventListener('click', () => move(i, j));
+                    board.appendChild(cell);
+                }
+                board.appendChild(document.createElement('br'));
+            }
+        }
+
+        function move(y, x) {
+            if (!pattern[y][x]) {
+                pattern[y][x] = type;
+                type = 3 - type;
+                show();
+            }
+        }
+
+        show();
+
+    </script>
+</body>
+
+</html>
