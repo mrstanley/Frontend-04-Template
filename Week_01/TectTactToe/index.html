@@ -30,8 +30,8 @@
 
     <script>
         const pattern = [
-            [1, 0, 0],
-            [0, 2, 0],
+            [0, 0, 0],
+            [0, 0, 0],
             [0, 0, 0]
         ]
 
@@ -56,11 +56,74 @@
         }
 
         function move(y, x) {
-            if (!pattern[y][x]) {
-                pattern[y][x] = type;
+            // 如果已落子
+            if (pattern[y][x]) return;
+            pattern[y][x] = type;
+            if (checkWin()) {
+                alert(`${type === 2 ? '✔' : '✘'} 赢了`)
+                reset();
+                type = 1;
+            } else {
                 type = 3 - type;
-                show();
             }
+            show();
+        }
+
+        function reset() {
+            for (let i = 0; i < pattern.length; i++) {
+                let win = true;
+                for (let j = 0; j < pattern[i].length; j++) {
+                    pattern[i][j] = 0;
+                }
+            }
+        }
+
+        function checkWin() {
+            for (let i = 0; i < pattern.length; i++) {
+                let win = true;
+                for (let j = 0; j < pattern[i].length; j++) {
+                    if (pattern[i][j] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            for (let i = 0; i < pattern[0].length; i++) {
+                let win = true;
+                for (let j = 0; j < pattern.length; j++) {
+                    if (pattern[j][i] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            {
+                let win = true;
+                for (let i = 0; i < pattern.length; i++) {
+                    if (pattern[i][i] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            {
+                let win = true;
+                for (let i = 0; i < pattern.length; i++) {
+                    if (pattern[i][2 - i] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         show();
