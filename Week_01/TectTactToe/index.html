@@ -59,14 +59,36 @@
             // 如果已落子
             if (pattern[y][x]) return;
             pattern[y][x] = type;
-            if (checkWin()) {
-                alert(`${type === 2 ? '✔' : '✘'} 赢了`)
-                reset();
-                type = 1;
-            } else {
-                type = 3 - type;
+            if (checkWin(pattern, type)) {
+                (function (type) {
+                    setTimeout(() => {
+                        alert(`${type === 2 ? '✔' : '✘'} 赢了`);
+                    }, 100);
+                })(type)
             }
+            type = 3 - type;
             show();
+            if (willWin(pattern, type)) {
+                console.log(`${type === 2 ? '✔' : '✘'} 要赢了`)
+            }
+        }
+
+        function deepClone(parttern) {
+            return JSON.parse(JSON.stringify(parttern));
+        }
+
+        function willWin(pattern, type) {
+            for (let i = 0; i < pattern.length; i++) {
+                for (let j = 0; j < pattern[i].length; j++) {
+                    if (pattern[i][j])
+                        continue;
+                    const current = deepClone(pattern);
+                    current[i][j] = type;
+                    if (checkWin(current, type))
+                        return true;
+                }
+            }
+            return false;
         }
 
         function reset() {
@@ -78,7 +100,7 @@
             }
         }
 
-        function checkWin() {
+        function checkWin(pattern, type) {
             for (let i = 0; i < pattern.length; i++) {
                 let win = true;
                 for (let j = 0; j < pattern[i].length; j++) {
