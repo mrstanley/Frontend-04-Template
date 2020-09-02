@@ -47,15 +47,15 @@
                     const value = pattern[i][j];
                     cell.innerText =
                         value === 2 ? '✔' :
-                        value === 1 ? '✘' : '';
-                    cell.addEventListener('click', () => move(i, j));
+                            value === 1 ? '✘' : '';
+                    cell.addEventListener('click', () => move(j, i));
                     board.appendChild(cell);
                 }
                 board.appendChild(document.createElement('br'));
             }
         }
 
-        function move(y, x) {
+        function move(x, y) {
             // 如果已落子
             if (pattern[y][x]) return;
             pattern[y][x] = type;
