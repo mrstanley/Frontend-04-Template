@@ -46,8 +46,8 @@
                     cell.classList.add('cell')
                     const value = pattern[i][j];
                     cell.innerText =
-                        value === 2 ? '✔' :
-                            value === 1 ? '✘' : '';
+                        value === 2 ? '⚪' :
+                            value === 1 ? '⚫' : '';
                     cell.addEventListener('click', () => move(j, i));
                     board.appendChild(cell);
                 }
@@ -62,14 +62,15 @@
             if (checkWin(pattern, type)) {
                 (function (type) {
                     setTimeout(() => {
-                        alert(`${type === 2 ? '✔' : '✘'} 赢了`);
+                        alert(`${type === 2 ? '⚪' : '⚫'} 赢了`);
                     }, 100);
                 })(type)
             }
             type = 3 - type;
+            console.log(bestChoice(pattern, type));
             show();
             if (willWin(pattern, type)) {
-                console.log(`${type === 2 ? '✔' : '✘'} 要赢了`)
+                console.log(`${type === 2 ? '⚪' : '⚫'} 要赢了`)
             }
         }
 
@@ -85,10 +86,39 @@
                     const current = deepClone(pattern);
                     current[i][j] = type;
                     if (checkWin(current, type))
-                        return true;
+                        return [j, i];
                 }
             }
-            return false;
+            return null;
+        }
+
+        function bestChoice(pattern, type) {
+            let p;
+            if (p = willWin(pattern, type)) {
+                return {
+                    point: p,
+                    result: 1
+                }
+            }
+            let result = -2;
+            let point = null;
+            for (let i = 0; i < pattern.length; i++) {
+                for (let j = 0; j < pattern[i].length; j++) {
+                    if (pattern[i][j])
+                        continue;
+                    const tmp = deepClone(pattern);
+                    tmp[i][j] = type;
+                    let r = bestChoice(tmp, 3 - type).result;
+                    if (-r > result) {
+                        result = -r;
+                        point = [j, i]
+                    }
+                }
+            }
+            return {
+                point: point,
+                result: point ? result : 0
+            }
         }
 
         function checkWin(pattern, type) {

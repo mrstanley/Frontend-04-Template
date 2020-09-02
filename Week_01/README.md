@@ -167,3 +167,34 @@
     ```
 
 2. 完美AI能力
+
+    ```js
+    function bestChoice(pattern, type) {
+        let p;
+        if (p = willWin(pattern, type)) {
+            return {
+                point: p,
+                result: 1
+            }
+        }
+        let result = -2;
+        let point = null;
+        for (let i = 0; i < pattern.length; i++) {
+            for (let j = 0; j < pattern[i].length; j++) {
+                if (pattern[i][j])
+                    continue;
+                const tmp = deepClone(pattern);
+                tmp[i][j] = type;
+                let r = bestChoice(tmp, 3 - type).result;
+                if (-r > result) {
+                    result = -r;
+                    point = [j, i]
+                }
+            }
+        }
+        return {
+            point: point,
+            result: point ? result : 0
+        }
+    }
+    ```
