@@ -47,7 +47,7 @@
                     const value = pattern[i][j];
                     cell.innerText =
                         value === 2 ? '✔' :
-                            value === 1 ? '✘' : '';
+                        value === 1 ? '✘' : '';
                     cell.addEventListener('click', () => move(i, j));
                     board.appendChild(cell);
                 }
@@ -89,15 +89,6 @@
                 }
             }
             return false;
-        }
-
-        function reset() {
-            for (let i = 0; i < pattern.length; i++) {
-                let win = true;
-                for (let j = 0; j < pattern[i].length; j++) {
-                    pattern[i][j] = 0;
-                }
-            }
         }
 
         function checkWin(pattern, type) {
