@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TecTacToe - 三子棋</title>
+    <style>
+        #board .cell {
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            text-align: center;
+            font-size: 50px;
+            background-color: green;
+            color: red;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 2px;
+            overflow: hidden;
+            user-select: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="board"></div>
+
+    <script>
+        const pattern = [
+            0, 0, 0,
+            0, 0, 0,
+            0, 0, 0
+        ]
+
+        let type = 1;
+
+        function show() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell')
+                    const value = pattern[i * 3 + j];
+                    cell.innerText =
+                        value === 2 ? '⚪' :
+                            value === 1 ? '⚫' : '';
+                    cell.addEventListener('click', () => move(i * 3 + j));
+                    board.appendChild(cell);
+                }
+                board.appendChild(document.createElement('br'));
+            }
+        }
+
+        function move(p) {
+            // 如果已落子
+            if (pattern[p]) return;
+            pattern[p] = type;
+            if (checkWin(pattern, type)) {
+                (function (type) {
+                    setTimeout(() => {
+                        alert(`${type === 2 ? '⚪' : '⚫'} 赢了`);
+                    }, 100);
+                })(type)
+            }
+            type = 3 - type;
+            console.log(bestChoice(pattern, type));
+            show();
+            if (willWin(pattern, type)) {
+                console.log(`${type === 2 ? '⚪' : '⚫'} 要赢了`)
+            }
+        }
+
+        function deepClone(parttern) {
+            return Object.create(parttern);
+        }
+
+        function willWin(pattern, type) {
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i * 3 + j])
+                        continue;
+                    const current = deepClone(pattern);
+                    current[i * 3 + j] = type;
+                    if (checkWin(current, type))
+                        return [j, i];
+                }
+            }
+            return null;
+        }
+
+        function bestChoice(pattern, type) {
+            let p;
+            if (p = willWin(pattern, type)) {
+                return {
+                    point: p,
+                    result: 1
+                }
+            }
+            let result = -1;
+            let point = null;
+            outer:for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i * 3 + j])
+                        continue;
+                    const tmp = deepClone(pattern);
+                    tmp[i * 3 + j] = type;
+                    let r = bestChoice(tmp, 3 - type).result;
+                    if (-r > result) {
+                        result = -r;
+                        point = [j, i]
+                    }
+                    if (result === 1)
+                        break outer;
+                }
+            }
+            return {
+                point: point,
+                result: point ? result : 0
+            }
+        }
+
+        function checkWin(pattern, type) {
+            for (let i = 0; i < 3; i++) {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[i * 3 + j] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            for (let i = 0; i < 3; i++) {
+                let win = true;
+                for (let j = 0; j < 3; j++) {
+                    if (pattern[j * 3 + i] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i * 3 + i] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            {
+                let win = true;
+                for (let i = 0; i < 3; i++) {
+                    if (pattern[i * 3 + 2 - i] !== type) {
+                        win = false;
+                    }
+                }
+                if (win) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        show();
+
+    </script>
+</body>
+
+</html>

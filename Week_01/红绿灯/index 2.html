@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红绿灯</title>
+    <style>
+        .container .item {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: gray;
+            margin-top: 10px;
+            margin-left: 10px;
+            border: solid 2px #555555;
+        }
+
+        .container .item.red {
+            background-color: red;
+        }
+
+        .container .item.green {
+            background-color: green;
+        }
+
+        .container .item.yellow {
+            background-color: yellow;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="item"></div>
+        <div class="item"></div>
+        <div class="item"></div>
+    </div>
+    <script>
+        const light = document.querySelectorAll('.container .item');
+
+        function green() {
+            light[0].classList.remove('red');
+            light[2].classList.add('green');
+        }
+
+        function yellow() {
+            light[2].classList.remove('green');
+            light[1].classList.add('yellow');
+        }
+
+        function red() {
+            light[1].classList.remove('yellow');
+            light[0].classList.add('red');
+        }
+
+        function sleep(timeout) {
+            return new Promise((resolve, reject) => {
+                setTimeout(resolve, timeout);
+            });
+        }
+
+        function run() {
+            green();
+            sleep(10000).then(() => {
+                yellow();
+                return sleep(2000)
+            }).then(() => {
+                red();
+                return sleep(5000)
+            }).then(run)
+        }
+        run();
+    </script>
+</body>
+
+</html>
