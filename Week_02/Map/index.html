@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <style>
+        .cell {
+            float: left;
+            line-height: 7px;
+            width: 6px;
+            height: 6px;
+            background-color: gray;
+            border-bottom: solid 1px #ffffff;
+            border-right: solid 1px #ffffff;
+            vertical-align: top;
+            font-size: 0px;
+        }
+
+        #container {
+            width: 701px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="container"></div>
+    <button onclick="localStorage.setItem('map', JSON.stringify(cells))">保存</button>
+    <button onclick="clearMap()">清除</button>
+    <script>
+
+        const container = document.getElementById('container');
+        let mousedown = false;
+        let clear = false;
+
+        function show() {
+            const cells = localStorage.getItem('map') && JSON.parse(localStorage.getItem('map')) || Array(10000).fill(0);
+            for (let i = 0; i < 100; i++) {
+                for (let j = 0; j < 100; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    if (cells[i * 100 + j] === 1) {
+                        cell.style.background = 'black';
+                    }
+                    cell.addEventListener('mousemove', (ev) => {
+                        if (mousedown) {
+                            console.log("mousedown", mousedown)
+                            if (clear) {
+                                cell.style.background = 'gray';
+                                cells[i * 100 + j] = 0;
+                            } else {
+                                cell.style.background = 'black';
+                                cells[i * 100 + j] = 1;
+                            }
+                        }
+                    })
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        show();
+
+        function clearMap() {
+            localStorage.setItem('map', '');
+            container.innerHTML = '';
+            show();
+        }
+
+        container.addEventListener('mousedown', (ev) => {
+            mousedown = true;
+            clear = (ev.which === 3);
+        })
+
+        container.addEventListener('mouseup', (ev) => {
+            mousedown = false;
+            clear = false;
+        })
+
+    </script>
+</body>
+
+</html>
