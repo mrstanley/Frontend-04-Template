@@ -29,45 +29,34 @@
 
     <div id="container"></div>
     <button onclick="localStorage.setItem('map', JSON.stringify(cells))">保存</button>
-    <button onclick="clearMap()">清除</button>
     <script>
 
         const container = document.getElementById('container');
         let mousedown = false;
         let clear = false;
 
-        function show() {
-            const cells = localStorage.getItem('map') && JSON.parse(localStorage.getItem('map')) || Array(10000).fill(0);
-            for (let i = 0; i < 100; i++) {
-                for (let j = 0; j < 100; j++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    if (cells[i * 100 + j] === 1) {
-                        cell.style.background = 'black';
-                    }
-                    cell.addEventListener('mousemove', (ev) => {
-                        if (mousedown) {
-                            console.log("mousedown", mousedown)
-                            if (clear) {
-                                cell.style.background = 'gray';
-                                cells[i * 100 + j] = 0;
-                            } else {
-                                cell.style.background = 'black';
-                                cells[i * 100 + j] = 1;
-                            }
-                        }
-                    })
-                    container.appendChild(cell);
+        const cells = localStorage.getItem('map') && JSON.parse(localStorage.getItem('map')) || Array(10000).fill(0);
+        for (let i = 0; i < 100; i++) {
+            for (let j = 0; j < 100; j++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                if (cells[i * 100 + j] === 1) {
+                    cell.style.background = 'black';
                 }
+                cell.addEventListener('mousemove', (ev) => {
+                    if (mousedown) {
+                        console.log("mousedown", mousedown)
+                        if (clear) {
+                            cell.style.background = 'gray';
+                            cells[i * 100 + j] = 0;
+                        } else {
+                            cell.style.background = 'black';
+                            cells[i * 100 + j] = 1;
+                        }
+                    }
+                })
+                container.appendChild(cell);
             }
-        }
-
-        show();
-
-        function clearMap() {
-            localStorage.setItem('map', '');
-            container.innerHTML = '';
-            show();
         }
 
         container.addEventListener('mousedown', (ev) => {
@@ -79,6 +68,52 @@
             mousedown = false;
             clear = false;
         })
+
+        function sleep(time) {
+            return new Promise((resolve) => setTimeout(resolve, time));
+        }
+
+
+        async function foundPath(map, start, end) {
+            const table = Object.create(map);
+            const queue = [start];
+
+            async function insert(x, y, prev) {
+                if (x < 0 || x >= 100 || y < 0 || y >= 100)
+                    return;
+                if (table[100 * y + x])
+                    return;
+                table[100 * y + x] = prev;
+                container.children[100 * y + x].style.background = 'green';
+                queue.push([x, y]);
+            }
+
+            while (queue.length) {
+
+                let [x, y] = queue.shift();
+                if (x === end[0] && y === end[1]) {
+                    let path = []
+                    // while (x != start[0] || y != start[1]) {
+                    //     path.push(map[100 * y + x])
+                    //     [x, y] = table[100 * y + x];
+                    //     container.children[100 * y + x].style.background = 'blue';
+                    // }
+                    return path;
+                }
+
+                await insert(x - 1, y, [x, y]);
+                await insert(x + 1, y, [x, y]);
+                await insert(x, y - 1, [x, y]);
+                await insert(x, y + 1, [x, y]);
+
+                await insert(x - 1, y - 1, [x, y]);
+                await insert(x + 1, y - 1, [x, y]);
+                await insert(x - 1, y + 1, [x, y]);
+                await insert(x + 1, y + 1, [x, y]);
+            }
+
+            return null
+        }
 
     </script>
 </body>
