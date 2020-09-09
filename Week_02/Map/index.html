@@ -12,8 +12,8 @@
             width: 6px;
             height: 6px;
             background-color: gray;
-            border-bottom: solid 1px #ffffff;
-            border-right: solid 1px #ffffff;
+            border-bottom: solid 1px #cccccc;
+            border-right: solid 1px #cccccc;
             vertical-align: top;
             font-size: 0px;
         }
@@ -84,20 +84,21 @@
                 if (table[100 * y + x])
                     return;
                 table[100 * y + x] = prev;
-                container.children[100 * y + x].style.background = 'green';
+                container.children[100 * y + x].style.background = 'darkgreen';
                 queue.push([x, y]);
             }
 
             while (queue.length) {
 
                 let [x, y] = queue.shift();
+
                 if (x === end[0] && y === end[1]) {
-                    let path = []
-                    // while (x != start[0] || y != start[1]) {
-                    //     path.push(map[100 * y + x])
-                    //     [x, y] = table[100 * y + x];
-                    //     container.children[100 * y + x].style.background = 'blue';
-                    // }
+                    let path = [];
+                    while (x != start[0] || y != start[1]) {
+                        path.push(table[100 * y + x]);
+                        [x, y] = table[100 * y + x];
+                        container.children[100 * y + x].style.background = 'darkblue';
+                    }
                     return path;
                 }
 
