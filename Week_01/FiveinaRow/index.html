@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五子棋</title>
+  <style>
+    #pattern-box {
+      border-right: solid 1px green;
+      border-bottom: solid 1px green;
+      float: left;
+    }
+
+    .cell {
+      display: inline-block;
+      vertical-align: middle;
+      height: 30px;
+      width: 30px;
+      line-height: 30px;
+      text-align: center;
+      border-top: solid 1px green;
+      border-left: solid 1px green;
+      font-size: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="pattern-box"></div>
+  <script>
+    const patternBox = document.getElementById('pattern-box');
+
+    const pattern = new Array(225).fill(0);
+
+    let color = 1;
+
+    function show() {
+      patternBox.innerHTML = ''
+      for (let i = 0; i < 15; i++) {
+        for (let j = 0; j < 15; j++) {
+          let index = i * 15 + j;
+          const value = pattern[index];
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.innerHTML = value === 1 ? '❌' :
+            value === 2 ? '⭕️' : `${i},${j}`
+          cell.addEventListener('click', () => move(index));
+          patternBox.appendChild(cell);
+        }
+        const br = document.createElement('br');
+        patternBox.appendChild(br)
+      }
+    }
+
+    function move(index) {
+      if (pattern[index]) return;
+      pattern[index] = color;
+      let win = willWin(index, color);
+      console.log("🚀 ~ file: index.html ~ line 60 ~ move ~ win", win)
+      if (win) {
+        alert(`${color === 1 ? '❌' : '⭕️'} 赢了`);
+      }
+      color = 3 - color;
+      show();
+    }
+
+
+    function willWin(index, color) {
+
+      let i, j;
+      i = parseInt(index / 15)
+      j = index % 15;
+
+      {
+        let winArray = [];
+        let range = [j < 4 ? 0 : j - 4, j + 4 > 14 ? 14 : j + 5];
+        for (let index = i * 15 + range[0]; index < (i + 1) * 15 + range[1]; index++) {
+          if (pattern[index] === color) {
+            winArray.push(index);
+            if (winArray.length === 5) return true;
+          } else {
+            winArray = [];
+          }
+        }
+      }
+
+      {
+        let winArray = [];
+        let range = [i < 4 ? 0 : i - 4, i + 4 > 14 ? 14 : i + 5];
+        for (let i = range[0]; i < range[1]; i++) {
+          let index = (i * 15 + j);
+          if (pattern[index] === color) {
+            winArray.push(index);
+            if (winArray.length === 5) return true;
+          } else {
+            winArray = [];
+          }
+        }
+      }
+
+      {
+        winArray = [];
+        let list = [];
+        for (let j1 = j, i1 = i; (j1 >= 0 && i1 >= 0); j1--, i1--) {
+          if (j - j1 > 4) break;
+          list.unshift([i1, j1]);
+        }
+        for (let j1 = j + 1, i1 = i + 1; (j1 <= 14 && i1 <= 14); j1++, i1++) {
+          if (j1 - j > 4) break;
+          list.push([i1, j1]);
+        }
+        for (let i = 0; i < list.length; i++) {
+          let index = (list[i][0] * 15 + list[i][1]);
+          if (pattern[index] === color) {
+            winArray.push(index);
+            if (winArray.length === 5) return true;
+          } else {
+            winArray = [];
+          }
+        }
+      }
+
+
+      return false;
+    }
+
+    show();
+
+  </script>
+</body>
+
+</html>
