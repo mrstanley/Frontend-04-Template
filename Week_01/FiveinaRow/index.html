@@ -45,7 +45,7 @@
           const cell = document.createElement('div');
           cell.classList.add('cell');
           cell.innerHTML = value === 1 ? '❌' :
-            value === 2 ? '⭕️' : `${i},${j}`
+            value === 2 ? '⭕️' : `${i*15+j}`
           cell.addEventListener('click', () => move(index));
           patternBox.appendChild(cell);
         }
@@ -57,17 +57,125 @@
     function move(index) {
       if (pattern[index]) return;
       pattern[index] = color;
-      let win = willWin(index, color);
+      let win = checkWin(pattern, index, color);
       console.log("🚀 ~ file: index.html ~ line 60 ~ move ~ win", win)
       if (win) {
         alert(`${color === 1 ? '❌' : '⭕️'} 赢了`);
       }
       color = 3 - color;
       show();
+      console.log(beastChoice(pattern, color))
+      if (willWin(pattern, color)) {
+        alert(`${color === 1 ? '❌' : '⭕️'} 要赢了`);
+      }
     }
 
 
-    function willWin(index, color) {
+    function willWin(pattern, color) {
+      for (let i = 0; i < 15; i++) {
+        for (let j = 0; j < 15; j++) {
+          let index = i * 15 + j;
+          if (pattern[index]) continue;
+          let current = Object.create(pattern);
+          current[index] = color;
+          if (checkWin(current, index, color)) return [i, j];
+        }
+      }
+      return null;
+    }
+
+    function beastChoice(pattern, color) {
+      let p;
+      if (p = willWin(pattern, color)) {
+        return {
+          point: p,
+          result: 1
+        }
+      }
+
+      let result = -1;
+      let point = null;
+
+      let list = [];
+
+      let hasDote = pattern.forEach((v, index) => {
+        if (v === color) list.push(index);
+      });
+
+      let emptyList = [];
+
+      list.forEach(idx => {
+        let i, j;
+        i = parseInt(idx / 15)
+        j = idx % 15;
+
+        {
+          let range = [j < 4 ? 0 : j - 4, j + 4 > 14 ? 14 : j + 5];
+          for (let index = i * 15 + range[0]; index < i * 15 + range[1]; index++) {
+            if (pattern[index] === 0) {
+              emptyList.push(index);
+            }
+          }
+        }
+
+        {
+          let range = [i < 4 ? 0 : i - 4, i + 4 > 14 ? 14 : i + 5];
+          for (let i = range[0]; i < range[1]; i++) {
+            let index = (i * 15 + j);
+            if (pattern[index] === 0) {
+              emptyList.push(index);
+            }
+          }
+        }
+
+        {
+          let list = [];
+          for (let j1 = j, i1 = i; (j1 >= 0 && i1 >= 0); j1--, i1--) {
+            if (j - j1 > 4) break;
+            list.unshift([i1, j1]);
+          }
+          for (let j1 = j + 1, i1 = i + 1; (j1 <= 14 && i1 <= 14); j1++, i1++) {
+            if (j1 - j > 4) break;
+            list.push([i1, j1]);
+          }
+          for (let i = 0; i < list.length; i++) {
+            let index = (list[i][0] * 15 + list[i][1]);
+            if (pattern[index] === 0) {
+              emptyList.push(index);
+            }
+          }
+        }
+
+        {
+          let list = [];
+          for (let j1 = j, i1 = i; (j1 >= 0 && i1 <= 14); j1--, i1++) {
+            if (i1 - i > 4) break;
+            list.unshift([i1, j1]);
+          }
+          for (let j1 = j + 1, i1 = i - 1; (j1 <= 14 && i1 >= 0); j1++, i1--) {
+            if (j1 - j > 4) break;
+            list.push([i1, j1]);
+          }
+          for (let i = 0; i < list.length; i++) {
+            let index = (list[i][0] * 15 + list[i][1]);
+            if (pattern[index] === 0) {
+              emptyList.push(index);
+            }
+          }
+        }
+
+      })
+
+      console.log("🚀 ~ file: index.html ~ line 106 ~ beastChoice ~ emptyList", emptyList)
+
+      return {
+        point: point,
+        result: point ? result : 0
+      }
+
+    }
+
+    function checkWin(pattern, index, color) {
 
       let i, j;
       i = parseInt(index / 15)
@@ -76,7 +184,7 @@
       {
         let winArray = [];
         let range = [j < 4 ? 0 : j - 4, j + 4 > 14 ? 14 : j + 5];
-        for (let index = i * 15 + range[0]; index < (i + 1) * 15 + range[1]; index++) {
+        for (let index = i * 15 + range[0]; index < i * 15 + range[1]; index++) {
           if (pattern[index] === color) {
             winArray.push(index);
             if (winArray.length === 5) return true;
@@ -122,6 +230,28 @@
         }
       }
 
+
+      {
+        winArray = [];
+        let list = [];
+        for (let j1 = j, i1 = i; (j1 >= 0 && i1 <= 14); j1--, i1++) {
+          if (i1 - i > 4) break;
+          list.unshift([i1, j1]);
+        }
+        for (let j1 = j + 1, i1 = i - 1; (j1 <= 14 && i1 >= 0); j1++, i1--) {
+          if (j1 - j > 4) break;
+          list.push([i1, j1]);
+        }
+        for (let i = 0; i < list.length; i++) {
+          let index = (list[i][0] * 15 + list[i][1]);
+          if (pattern[index] === color) {
+            winArray.push(index);
+            if (winArray.length === 5) return true;
+          } else {
+            winArray = [];
+          }
+        }
+      }
 
       return false;
     }
